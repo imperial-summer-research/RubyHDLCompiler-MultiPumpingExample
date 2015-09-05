@@ -1,0 +1,62 @@
+//
+// Imports:
+// standard imports:
+import com.maxeler.maxcompiler.v2.build.EngineParameters;
+import com.maxeler.maxcompiler.v2.managers.custom.CustomManager;
+import com.maxeler.maxcompiler.v2.managers.custom.DFELink;
+import com.maxeler.maxcompiler.v2.managers.custom.blocks.KernelBlock;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.CPUTypes;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.EngineInterface;
+import com.maxeler.maxcompiler.v2.managers.engine_interfaces.InterfaceParam;
+
+// class:
+public class Manager0 extends CustomManager {
+
+public Manager0 (EngineParameters params) {
+   super(params);
+
+   // kernel block declarations:
+   KernelBlock k0 = new Kernel1("Kernel1", makeKernelParameters(params));
+   KernelBlock k1 = new Kernel2("Kernel2", makeKernelParameters(params));
+
+   // kernel block clocks declarations:
+   float clk = 100;
+   config.setDefaultStreamClockFrequency(clk);
+   ManagerClock clk0 = generateStreamClock("clk0", clk * 1.0);
+   k0.setClock(clk0);
+   ManagerClock clk1 = generateStreamClock("clk1", clk * 2.0);
+   k1.setClock(clk1);
+
+   // DFELinks declarations:
+   addStreamToCPU("board2cpu_0") <== k1.getOutput("out4");
+   addStreamToCPU("board2cpu_1") <== k1.getOutput("out3");
+   k1.getInput("inp4") <== k0.getOutput("out2");
+   addStreamToCPU("board2cpu_2") <== k0.getOutput("out1");
+   k0.getInput("inp3") <== addStreamFromCPU("cpu2board_0");
+   k0.getInput("inp2") <== addStreamFromCPU("cpu2board_1");
+   k0.getInput("inp1") <== addStreamFromCPU("cpu2board_2");
+
+   createSLiCInterface(interfaceDefault());
+} // end constructor
+public static EngineInterface interfaceDefault() {
+   EngineInterface ei = new EngineInterface();
+   InterfaceParam N = ei.addParam("N", CPUTypes.INT);
+
+   // set ticks
+   ei.setTicks("Kernel1", N * 1.0);
+   ei.setTicks("Kernel2", N * 2.0);
+
+   // set streams
+   ei.setStream("board2cpu_0", N);
+   ei.setStream("board2cpu_1", N);
+   ei.setStream("board2cpu_2", N);
+   ei.setStream("cpu2board_0", N);
+   ei.setStream("cpu2board_1", N);
+   ei.setStream("cpu2board_2", N);
+}
+public static void main(String [] args) {
+   Manager0 m = new Manager0(new EngineParameters(args));
+   m.build();
+}
+} // end class
+////////////////////////////////////////////////////////////////////

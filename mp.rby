@@ -1,0 +1,6 @@
+
+# Mega multipumping test
+
+INCLUDE "prelude.rby".
+
+current = [inc, pdsr 2]; [inc, inc]; [inc, sdpr 2].
